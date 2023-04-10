@@ -2,8 +2,9 @@ import pygame
 
 
 class Fighter:
-    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps):
+    def __init__(self, player, x, y, flip, data, sprite_sheet, animation_steps, sfx):
         self.player = player
+        self.sfx = sfx
         self.size = data[0]
         self.image_scale = data[1]
         self.offset = data[2]
@@ -20,7 +21,7 @@ class Fighter:
         self.flip = flip
         self.vel_y = 0
         self.running = False
-        self.health = 100
+        self.health = 10
         self.alive = True
         self.animation_list = self.load_images(sprite_sheet, animation_steps)
         self.image = self.animation_list[self.action][self.frame_index]
@@ -40,7 +41,7 @@ class Fighter:
         ]
         return animation_list
 
-    def move(self, screen_width, screen_height, surface, target):
+    def move(self, screen_width, screen_height, target, round_over):
         SPEED = 10
         GRAVITY = 2
         dx = 0
@@ -49,7 +50,7 @@ class Fighter:
         self.attack_type = 0
 
         key = pygame.key.get_pressed()
-        if not self.attacking and self.alive:
+        if not self.attacking and self.alive and not round_over:
             if self.player == 1:
                 if key[pygame.K_a]:
                     dx = -SPEED
@@ -65,7 +66,7 @@ class Fighter:
                         self.attack_type = 1
                     else:
                         self.attack_type = 2
-                    self.attack(surface, target)
+                    self.attack(target)
             if self.player == 2:
                 if key[pygame.K_LEFT]:
                     dx = -SPEED
@@ -81,7 +82,7 @@ class Fighter:
                         self.attack_type = 1
                     else:
                         self.attack_type = 2
-                    self.attack(surface, target)
+                    self.attack(target)
 
         self.vel_y += GRAVITY
         dy += self.vel_y
@@ -95,7 +96,7 @@ class Fighter:
             self.jump = False
             dy = screen_height - 110 - self.rect.bottom
 
-        if target.rect.centerx > self.rect.centerx:
+        if target.rect.centerx >= self.rect.centerx and self.alive:
             self.flip = False
         else:
             self.flip = True
@@ -148,20 +149,19 @@ class Fighter:
             self.frame_index = 0
             self.update_time = pygame.time.get_ticks()
 
-    def attack(self, surface, target):
+    def attack(self, target):
         target.hit = False
         if self.attack_cooldown == 0:
             self.attacking = True
             attacking_rect = pygame.Rect(
                 self.rect.centerx - (2 * self.rect.width * self.flip),
                 self.rect.y, 2 * self.rect.width, self.rect.height)
+            self.sfx.play()
             if attacking_rect.colliderect(target.rect):
                 target.health -= 10
                 target.hit = True
-            pygame.draw.rect(surface, (0, 255, 0), attacking_rect)
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
-        pygame.draw.rect(surface, (255, 0, 0), self.rect)
         surface.blit(img, (self.rect.x - self.offset[0] * self.image_scale,
                            self.rect.y - self.offset[1] * self.image_scale))
