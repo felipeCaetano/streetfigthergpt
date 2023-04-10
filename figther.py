@@ -151,12 +151,12 @@ class Fighter:
 
 
     def update(self):
-
         animation_cooldown = 50
         if self.health <= 0:
             self.health = 0
             self.alive = False
             self.update_animation(6)
+            self.frame_index = len(self.animation_list[self.action]) - 1
         elif self.running:
             self.update_animation(1)
         elif self.jump:
@@ -175,17 +175,19 @@ class Fighter:
             self.frame_index += 1
             self.update_time = pygame.time.get_ticks()
         if self.frame_index >= len(self.animation_list[self.action]):
-            if not self.alive:
-                self.frame_index = len(self.animation_list[self.action]) - 1
-            else:
-                self.frame_index = 0
-                if self.action == 3 or self.action == 4:
-                    self.attacking = False
-                    self.attack_cooldown = 20
-                if self.action == 5:
-                    self.hit = False
-                    self.attacking = False
-                    self.attack_cooldown = 20
+            # if not self.alive:
+            #     self.frame_index = len(self.animation_list[self.action]) - 1
+            # else:
+            self.frame_index = 0
+            if self.action == 3 or self.action == 4:
+                self.reset_attack()
+            if self.action == 5:
+                self.hit = False
+                self.reset_attack()
+
+    def reset_attack(self):
+        self.attacking = False
+        self.attack_cooldown = 20
 
     def update_animation(self, new_action):
         if new_action != self.action:
