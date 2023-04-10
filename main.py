@@ -34,11 +34,9 @@ class Game:
         self.figther_2 = Fighter(
             2, 700, 310, True, WIZARD_DATA, self.wizard_sheet, WIZARD_ANIM_STEPS, self.magic_fx)
 
-    
     def draw_bg(self):
         scaled_bg = pygame.transform.scale(self.bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.screen.blit(scaled_bg, (0, 0))
-
 
     def draw_health_bar(self, health, x, y):
         ratio = health / 100
@@ -125,7 +123,6 @@ class Game:
                     self.screen.blit(self.victory_img, (360, 150))
 
             self.clock.tick(60)
-            self.screen.blit(self.screen, [0, 0])
             pygame.display.update()
 
     def round_reset(self):
