@@ -13,8 +13,8 @@ class Fighter:
         self.sfx = sfx
         self.action = 0
         self.action_dict = {
-            0: "idle", 1: "run", 2: "jump", 3: "attack1", 4: "attack2", 5:"hit", 6:"death"
-            }
+            0: "idle", 1: "run", 2: "jump", 3: "attack1", 4: "attack2", 5: "hit", 6: "death"
+        }
         self.frame_index = 0
         self.attack_cooldown = 0
         self.vel_y = 0
@@ -70,7 +70,7 @@ class Fighter:
             self.vel_y = 0
             self.jump = False
             dy = screen_height - 110 - self.rect.bottom
-        return dy,dx
+        return dy, dx
 
     def decrease_attack_cooldown(self):
         """
@@ -97,7 +97,7 @@ class Fighter:
             pygame.K_d: ('running', SPEED),
             pygame.K_w: ('jump', -30),
             pygame.K_r: ('attack_type', 1),
-            pygame.K_t: ('attack_type', 2),    
+            pygame.K_t: ('attack_type', 2),
         }
 
         key_actions_p2 = {
@@ -131,25 +131,6 @@ class Fighter:
                     self.attack(target)
         return dx
 
-    # def update(self):
-    #     cooldown = 50
-    #     actions = [6, 1, 2, 3, 4, 5, 0]
-    #     self.image = self.animation_list[self.action][self.frame_index]
-    #     self.frame_index += 1 if pygame.time.get_ticks() - self.update_time > cooldown else 0
-    #     if self.frame_index >= len(self.animation_list[self.action]):
-    #         if not self.alive:
-    #             self.frame_index = len(self.animation_list[self.action]) - 1
-    #         else:
-    #             self.frame_index = 0
-    #             if self.action in [3, 4]:
-    #                 self.attacking, self.attack_cooldown = False, 20
-    #             if self.action == 5:
-    #                 self.hit, self.attacking, self.attack_cooldown = False, False, 20
-    #     self.alive = self.health > 0
-    #     self.action = actions[6 * self.alive + self.running + 2 * self.jump + 3 * self.attacking + 4 * self.hit]
-    #     self.update_time = pygame.time.get_ticks()
-
-
     def update(self):
         animation_cooldown = 50
         if self.health <= 0:
@@ -175,9 +156,6 @@ class Fighter:
             self.frame_index += 1
             self.update_time = pygame.time.get_ticks()
         if self.frame_index >= len(self.animation_list[self.action]):
-            # if not self.alive:
-            #     self.frame_index = len(self.animation_list[self.action]) - 1
-            # else:
             self.frame_index = 0
             if self.action == 3 or self.action == 4:
                 self.reset_attack()
@@ -206,6 +184,12 @@ class Fighter:
             if attacking_rect.colliderect(target.rect):
                 target.health -= 10
                 target.hit = True
+                self.running = False
+                self.jump = False
+            else:
+                self.attacking = True
+                self.running = False
+                self.jump = False
 
     def draw(self, surface):
         img = pygame.transform.flip(self.image, self.flip, False)
